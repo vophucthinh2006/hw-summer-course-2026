@@ -97,7 +97,7 @@ int main() {
 
     // 4. Test Task 4
     int current_speed = 25; 
-    printf("--- ĐỊA CHỈ BIẾN TRÊN BỘ NHỚ ---\n");
+    printf("MEMORY ADDRESSES OF VARIABLES \n");
     printf("BIKE_MODEL (ROM/.rodata):   %p\n", (void*)BIKE_MODEL);
     printf("total_odometer (RAM/.bss):  %p\n", (void*)&total_odometer);
     printf("current_speed (RAM/Stack):  %p\n", (void*)&current_speed);
