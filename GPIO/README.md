@@ -146,7 +146,7 @@ Khi thiết kế hệ thống có nhiều nút bấm, việc kết nối mỗi n
 Hàng 1 (PA0) ────┼──[Nút 1]─────┼──[Nút 2]
                  │              │
 Hàng 2 (PA1) ────┼──[Nút 3]─────┼──[Nút 4]
-
+```
 **Nguyên lý Quét tuần tự (Time-multiplexed Scanning):**
 * **Cấu hình:** 2 chân Hàng ($R_1, R_2$) được cấu hình làm `GPIO_Output`. 2 chân Cột ($C_1, C_2$) được cấu hình làm `GPIO_Input Pull-up` (mặc định luôn đọc về mức 1 nhờ điện trở kéo lên nội tại).
 * **Cơ chế quét:** CPU sẽ lần lượt kéo duy nhất một Hàng xuống mức logic 0, hàng còn lại giữ ở mức 1. Ngay tại thời điểm đó, CPU tiến hành đọc đồng thời trạng thái của 2 Cột. Nếu một nút bấm tại giao điểm của Hàng đang quét và Cột đang đọc được nhấn, mức logic 0 từ Hàng sẽ truyền qua tiếp điểm nút bấm, kéo điện áp của Cột đó sụt từ 1 xuống 0. Bằng cách đối chiếu tọa độ `[Hàng ép xuống 0][Cột đọc về 0]`, hệ thống định vị chính xác phím đang tương tác.
