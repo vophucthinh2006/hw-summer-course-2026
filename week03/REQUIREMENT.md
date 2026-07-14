@@ -10,7 +10,7 @@ Bài tập này yêu cầu học viên vận dụng kiến thức về luồng b
 
 ## 2. YÊU CẦU
 
-Học viên phải hoàn thành **2 nhiệm vụ thực hành và viết script** cùng **4 câu hỏi tự luận mở**.
+Học viên phải hoàn thành **3 nhiệm vụ thực hành và viết script** cùng **6 câu hỏi tự luận mở**.
 
 ### Task 1 (Tổng quan Công cụ & Luồng làm việc): Phân tích trình tự và công dụng của Toolchain (Tự luận)
 
