@@ -85,7 +85,7 @@ Data flash Progress:
 
 Application running ...
 MCU Reset.
-
+```
 ---
 
 ## 5. HƯỚNG DẪN KIỂM TRA BÀI LÀM
@@ -93,9 +93,9 @@ MCU Reset.
 Sau khi hoàn thành bài tập, học viên có thể chạy thử với Project mẫu đã được gửi ở buổi học trước đó. Học viên hãy giữ file `build_and_flash.bat` này để sử dung trong quá trình build và flash xuyên suốt khóa học.
 
 Học viên chỉ cần thực hiện các bước sau để nghiệm thu bài tập:
-- **Bước 1**: Thả file build_and_flash.bat của mình vào trực tiếp thư mục Project mẫu đó.
-- **Bước 2**: Kết nối board STM32 Blue Pill với máy tính thông qua mạch nạp ST-Link/V2.
-- **Bước 3**: Nhấp đúp chuột để thực thi file build_and_flash.bat và quan sát hệ thống tự động hóa quy trình cho đến khi đèn LED trên mạch nạp bắt đầu nhấp nháy.
+### Bước 1: Thả file build_and_flash.bat của mình vào trực tiếp thư mục Project mẫu đó.
+### Bước 2: Kết nối board STM32 Blue Pill với máy tính thông qua mạch nạp ST-Link/V2.
+### Bước 3: Nhấp đúp chuột để thực thi file build_and_flash.bat và quan sát hệ thống tự động hóa quy trình cho đến khi đèn LED trên mạch nạp bắt đầu nhấp nháy.
 
 ---
 

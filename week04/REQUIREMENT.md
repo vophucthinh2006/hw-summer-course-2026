@@ -4,17 +4,44 @@
 
 Ngoại vi GPIO (General Purpose Input/Output) là cửa ngõ cơ bản nhất để vi điều khiển tương tác với thế giới vật lý bên ngoài. Để làm chủ ngoại vi này, một kỹ sư nhúng không chỉ đơn thuần là gọi các hàm thư viện có sẵn, mà cần phải hiểu rõ kiến trúc phần cứng bên trong (như cấu trúc Transistor PMOS/NMOS, mạch Pull-up/Pull-down), quy trình 3 bước cấu hình hệ thống (Clock -> Hardware -> Application Logic) và cách tối ưu hóa tài nguyên phần cứng qua các thuật toán quét ma trận.
 
-Bài tập này yêu cầu học viên vận dụng kiến thức từ buổi học để giải quyết các bài toán cấu hình GPIO cơ bản và hoàn thiện thuật toán quét mã trận phím $4\times4$ (Keypad) ứng dụng trên phần cứng mạch thật STM32 Blue Pill.
+Bài tập này yêu cầu học viên vận dụng kiến thức từ buổi học để giải quyết các bài toán cấu hình GPIO cơ bản và hoàn thiện thuật toán quét mã trận phím $2\times2$ (Keypad) ứng dụng trên phần cứng mạch thật STM32 Blue Pill.
 
 ---
 
 ## 2. CHUẨN BỊ MÔI TRƯỜNG & THƯ VIỆN HAL
 
-Để hoàn thành phần thực hành, học viên cần tải và cấu hình đầy đủ gói thư viện chuẩn từ nhà sản xuất STMicroelectronics. Thư viện này cung cấp các Driver phần cứng lớp HAL (Hardware Abstraction Layer) cần thiết cho dự án.
+Vì đây là lần đầu tiên các bạn tự tay xây dựng một dự án từ con số 0 với thư viện HAL thay vì sử dụng các IDE sinh code tự động, hãy đọc kỹ và làm theo đúng hướng dẫn từng bước dưới đây để chuẩn bị môi trường biên dịch.
 
-- **Tải gói thư viện STM32F1 Cube**: Học viên tải trực tiếp kho mã nguồn và thư viện chính thức tại [GitHub STMicroelectronics - STM32CubeF1](https://github.com/STMicroelectronics/STM32CubeF1).
-- **Thư mục cần lưu ý**: Sau khi giải nén, các file driver điều khiển GPIO nằm trong thư mục `Drivers/STM32F1xx_HAL_Driver/`. Học viên cần chú ý hai file cốt lõi là `stm32f1xx_hal_gpio.c` và `stm32f1xx_hal_gpio.h` để tích hợp vào project biên dịch qua CMake.
+### Bước 1: Tải mã nguồn thư viện chuẩn từ ST
+1. Học viên truy cập và tải kho mã nguồn chính thức của hãng tại: [GitHub STMicroelectronics - STM32CubeF1](https://github.com/STMicroelectronics/STM32CubeF1).
+2. Tải file `.zip` về và giải nén vào một thư mục cố định trên máy tính của bạn.
 
+### Bước 2: Cách lấy và copy các file Drivers cần thiết
+Để dự án GPIO hoạt động, bạn cần trích xuất đúng các file driver cần thiết từ gói thư viện vừa tải và bỏ vào thư mục Project của mình:
+1. Vào thư mục vừa giải nén, tìm đến đường dẫn: `Drivers/STM32F1xx_HAL_Driver/`
+2. Tiến hành sao chép (Copy) các file sau và bỏ vào thư mục chứa source code của bạn:
+   * **Các file `.h` (nằm trong thư mục `Inc/` của Driver):** Tìm và lấy file `stm32f1xx_hal_gpio.h` và file cấu hình chung `stm32f1xx_hal.h`.
+   * **Các file `.c` (nằm trong thư mục `Src/` của Driver):** Tìm và lấy file `stm32f1xx_hal_gpio.c` và file lõi `stm32f1xx_hal.c`.
+3. *Lưu ý:* Để gọi được các hàm GPIO, trong file `main.c` của bạn bắt buộc phải có dòng khai báo: `#include "stm32f1xx_hal.h"` ở đầu file.
+
+### Bước 3: Hướng dẫn chỉnh sửa file `CMakeLists.txt`
+Nếu bạn không khai báo các file thư viện mới copy vào cho CMake biết, quá trình biên dịch ở giai đoạn Linker sẽ báo lỗi `undefined reference`. Hãy mở file `CMakeLists.txt` của dự án lên và cập nhật theo hai mục sau:
+
+1. **Thêm file nguồn vào mục biên dịch (`target_sources`):**
+   Tìm đến hàm `target_sources` và thêm tên các file `.c` của thư viện HAL vừa copy vào danh sách (ngăn cách nhau bởi dấu cách hoặc xuống dòng):
+   ```cmake
+   target_sources(${PROJECT_NAME} PRIVATE
+       main.c
+       stm32f1xx_hal.c
+       stm32f1xx_hal_gpio.c
+       # Thêm các file nguồn khác của bạn tại đây
+   )
+```
+2. **Khai báo thư mục chứa file tiêu đề (`target_include_directories`):**
+Đảm bảo CMake biết nơi tìm các file `.h` bằng cách trỏ đúng đường dẫn thư mục chứa chúng (nếu bạn để cùng thư mục với `main.c` thì dùng dấu chấm `.` đại diện cho thư mục hiện hành):
+```cmake
+target_include_directories(${PROJECT_NAME} PRIVATE .)
+```
 ---
 
 ## 3. YÊU CẦU
@@ -51,7 +78,7 @@ Hệ thống cần mở rộng giao tiếp với Ma trận bàn phím $2\times2$
 	- **Cách 1 (Mạch điện tử thuần)**: Đấu nối led đơn trực tiếp với nút bấm thuộc ma trận phím (sử dụng thêm điện trở hạn dòng thích 	hợp). Khi phím được nhấn, mạch kín dòng điện làm LED sáng vật lý, đồng thời vi điều khiển đọc được logic phím.
 	- **Cách 2 (Điều khiển qua Firmware)**: Đấu nối LED đơn vào một chân GPIO trống bất kỳ trên board và cấu hình chân này làm Digital 	Output. Khi thuật toán quét ma trận phía trên phát hiện phím mục tiêu được nhấn, phần mềm sẽ ra lệnh xuất mức logic tương ứng để 	bật/tắt LED này.
   4. Quay 1 video ngắn (dưới 30 giây) demo cho sản phẩm phần cứng sau khi hoàn thành và đăng tải lên **Youtube** hoặc **Google Drive** (không bắt buộc Public hay Private).
-  **Học viên có thể tham khảo giải thuật sau đây:**
+  **Học viên có thể tham khảo sơ đồ đấu nối sau đây:**
 ![Sơ đồ ma trận phím](./docs/4x4-Matrix-Keypad.png)
 
 ---
@@ -63,13 +90,4 @@ Hệ thống cần mở rộng giao tiếp với Ma trận bàn phím $2\times2$
   * *Lưu ý*: Học viên phải nói rõ trong video hoặc ghi chú ở dòng đầu tiên của file `answers.txt` về việc mình đang chọn thiết kế LED phản hồi cho **Task 5** theo **Cách 1** hay **Cách 2**.
 ---
 
-## 4. KẾT QUẢ HIỂN THỊ MỤC TIÊU (LOG TERMINAL)
-
-Nếu học viên cấu hình thêm UART để debug kết quả quét phím (Khuyến khích, không bắt buộc), log trả về khi nhấn các phím sẽ tuần tự có dạng:
-
-```text
-[GPIO Init] Clock enabled for GPIOA and GPIOC.
-[GPIO Init] Matrix Keypad 4x4 Configured successfully.
-[Keypad Scan] Key '1' Pressed -> Turn ON LED!
-[Keypad Scan] Key '2' Pressed -> Turn OFF LED!
-[Keypad Scan] Key 'A' Pressed -> No action assigned.
+# Chúc các bạn làm bài vui vẻ!
